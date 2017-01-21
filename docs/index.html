@@ -1,0 +1,26 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>JSIP</title>
+<script src="script.js"></script>
+</head>
+<body>
+画像処理サンプル集<br>
+<hr>
+画像生成サンプル<br>
+<input type="button" value="赤い正方形" onclick="redbox()"/><br>
+<div id="redbox"></div><br>
+<input type="button" value="シンプルイロイロ" onclick="simple()"/><br>
+<div id="simple"></div><br>
+<hr>
+ファイル読み込みサンプル<br>
+<input type="file" id="selectfile" accept='image/*'><br>
+<input type="button" value="そのまま表示" onclick="fread()"/><br>
+<div id="fread"></div><br>
+<input type="button" value="640x480にリサイズ（余白ができる）" onclick="resize()"/><br>
+<div id="resize"></div><br>
+<input type="button" value="2値化" onclick="binarize()"/><br>
+<div id="binarize"></div><br>
+<hr>
+</body>
+</html>
