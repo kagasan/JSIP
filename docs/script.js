@@ -157,4 +157,105 @@ function binarize(){
 	document.getElementById("binarize").innerHTML = "<img src='" + dataurl + "'>";
 }
 
+function test(){
+	var canvas = document.createElement("canvas");
+	var ctx = canvas.getContext('2d');
+	function GetColor(R,G,B){
+		return "rgb("+R+","+G+","+B+")";
+	}
+	function DrawLine(x1, y1, x2, y2, color = GetColor(0,0,0), thickness = 1){
+		ctx.lineWidth = thickness;
+		ctx.strokeStyle=color;
+		ctx.beginPath();
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.stroke();
+	}
+	canvas.width = 640;
+	canvas.height = 480;
+	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+	var iw = img.width;
+	var ih = img.height;
+	var cw = canvas.width;
+	var ch = canvas.height;
+	
+	if(iw*ch/ih>cw){
+		ctx.drawImage(img,0,ch/2-ih*cw/iw/2,cw,ih*cw/iw);
+		iw = cw;
+		ih = ih*cw/iw;
+	}
+	else{
+		ctx.drawImage(img,cw/2-iw*ch/ih/2,0,iw*ch/ih,ch);
+		iw = iw*ch/ih;
+		ih = ch;
+	}
+	var Data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	var data = Data.data;
+	
+	//x1,y1,x2,y2,score
+	var L = 20;
+	var UDLR = [
+		[0,0,0,0,-1],
+		[0,0,0,0,-1],
+		[0,0,0,0,-1],
+		[0,0,0,0,-1]
+	];
+	
+	for(var y1 = 0;y1<ch/2;y1++){
+		for(var y2 = y1-L;y2<y1+L;y2++){
+			if(y2<0 || ch/2<=y2)continue;
+			var cnt=0;
+			for(var x=0;x<cw;x++){
+				var y = parseInt(0.0 + y1+x*(y2-y1)/cw);
+				var idx = (x + y * cw) * 4;
+				if(data[idx]>150 && data[idx + 1]<100 && data[idx + 2]<100)cnt++;
+			}
+			if(cnt>UDLR[0][4])UDLR[0]=[0,y1,cw,y2,cnt];
+		}
+	}
+	for(var y1 = ch/2;y1<ch;y1++){
+		for(var y2 = y1-L;y2<y1+L;y2++){
+			if(y2<ch/2 || ch<=y2)continue;
+			var cnt=0;
+			for(var x=0;x<cw;x++){
+				var y = parseInt(0.0 + y1+x*(y2-y1)/cw);
+				var idx = (x + y * cw) * 4;
+				if(data[idx]>150 && data[idx + 1]<100 && data[idx + 2]<100)cnt++;
+			}
+			if(cnt>UDLR[1][4])UDLR[1]=[0,y1,cw,y2,cnt];
+		}
+	}
+	for(var x1 = 0;x1<cw/2;x1++){
+		for(var x2 = x1-L;x2<x1+L;x2++){
+			if(x2<0 || cw/2<=x2)continue;
+			var cnt = 0;
+			for(var y=0;y<ch;y++){
+				var x = parseInt(0.0+x1+y*(x2-x1)/ch);
+				var idx = (x + y * cw) * 4;
+				if(data[idx]>150 && data[idx + 1]<100 && data[idx + 2]<100)cnt++;
+			}
+			if(cnt>UDLR[2][4])UDLR[2]=[x1,0,x2,ch,cnt];
+		}
+	}
+	for(var x1 = cw/2;x1<cw;x1++){
+		for(var x2 = x1-L;x2<x1+L;x2++){
+			if(x2<cw/2 || cw<=x2)continue;
+			var cnt = 0;
+			for(var y=0;y<ch;y++){
+				var x = parseInt(0.0+x1+y*(x2-x1)/ch);
+				var idx = (x + y * cw) * 4;
+				if(data[idx]>150 && data[idx + 1]<100 && data[idx + 2]<100)cnt++;
+			}
+			if(cnt>UDLR[3][4])UDLR[3]=[x1,0,x2,ch,cnt];
+		}
+	}
+	for(var i = 0;i<UDLR.length;i++){
+		DrawLine(UDLR[i][0],UDLR[i][1],UDLR[i][2],UDLR[i][3],GetColor(255,0,0),3);
+	}
+	
+	var dataurl = canvas.toDataURL();
+	document.getElementById("test").innerHTML = "<img src='" + dataurl + "'>";
+}
+
 //ここまで画像読み込みサンプル
